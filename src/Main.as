@@ -495,7 +495,7 @@
 		private var pointsTuto:Array;
 		private var tutoBaloonPos:Array;
 		private var tutoPos:int;
-		private var tutoSequence:Array = ["Arraste os animais...", 
+		private var tutoSequence:Array = ["Arraste os filos...", 
 										  "... para as caixas corretas...",
 										  "... conforme descrito nas orientações.",
 										  "Quando você tiver concluído, pressione \"terminei\"."];
@@ -508,13 +508,13 @@
 				addChild(balao);
 				balao.visible = false;
 				
-				pointsTuto = 	[new Point(330, 470),
-								new Point(235 , 150),
+				pointsTuto = 	[new Point(365, 510),
+								new Point(350 , 177),
 								new Point(650 , 500),
 								new Point(finaliza.x, finaliza.y + finaliza.height / 2)];
 								
 				tutoBaloonPos = [[CaixaTexto.BOTTON, CaixaTexto.CENTER],
-								[CaixaTexto.BOTTON, CaixaTexto.CENTER],
+								[CaixaTexto.TOP, CaixaTexto.CENTER],
 								[CaixaTexto.RIGHT, CaixaTexto.FIRST],
 								[CaixaTexto.TOP, CaixaTexto.FIRST]];
 			}
