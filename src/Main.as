@@ -157,10 +157,10 @@
 			var currentScore:Number = int((nCertas / nPecas) * 100);
 			
 			if (currentScore < 100) {
-				feedbackScreen.setText("Ops!... \nInicie uma nova tentativa para refazer o exercício.");
+				feedbackScreen.setText("Ops!... \nReveja sua resposta.");
 			}
 			else {
-				feedbackScreen.setText("Parabéns!\nA sequência está correta!");
+				feedbackScreen.setText("Parabéns!\nA classificação está correta!");
 			}
 			
 			if (!completed) {
