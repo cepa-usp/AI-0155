@@ -1,0 +1,73 @@
+Ambiente: ScormCloud
+Navegador: Google Chrome
+O.S: Windows XP
+
+CS1: Preencher todos os campos e avaliar - acertar todos 					[OK]
+	1. Preencher todos
+	2. Botão terminar
+	3. Voltar ao ambiente e verificar variáveis SCORM
+	
+	resultado esperado:
+		cmi.score_raw: 100					ok
+		cmi.score_min: 0					ok
+		cmi.score_max: 100					ok
+		cmi.completion_status: completed	ok
+
+*******************************************************************
+
+CS2: Reiniciar a atividade													[OK]
+	dependêcia: CS1
+
+	1. Lançar novamente a atividade
+			resultado esperado: ver objetos 					ok
+			reposicionados e travados
+	2. Apertar terminar
+			resultado esperado: ver mensagem sem reavaliar		ok
+	3. Voltar ao ambiente e verificar variáveis SCORM
+			resultado esperado: igual CS1						ok
+	
+		
+*******************************************************************
+		
+CS3: Preencher todos os campos e avaliar - errar 1 grupo					[OK]
+
+	1. Preencher todos, errando um
+	2. Botão terminar
+	3. Verificar Scorm
+	
+	resultado esperado:
+		cmi.score_raw: 75					ok
+		cmi.score_min: 0					ok
+		cmi.score_max: 100					ok
+		cmi.completion_status: completed	ok
+		
+*******************************************************************
+
+CS4: Revisão dos créditos													[OBS]
+
+	Obs.: 
+	Design instrucional: Marcelo Alvez ou Marcelo Alves?
+	Testes: + Arthur Tofani
+		
+*******************************************************************
+
+CS5: Revisão das orientações												[OBS]
+	1. Leitura do texto
+	
+	Obs.: 
+	linha 4: Eukarya  [itálico?]
+	linha 4: Referência não faz referência... não seria necessário colocar o nome 
+		do trabalho no final (ou em algum outro lugar?)
+	linha 8: Filo -> filo [minúsculo]
+
+*******************************************************************		
+		
+CS6: Caixas de mensagem:													[OBS]
+
+	1. Leitura do texto
+	Obs.:
+	Conceitual: "Reveja sua resposta" é adequado, considerando que não é permitido 
+	que o usuário refaça a atividade
+	
+
+	
