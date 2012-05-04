@@ -238,8 +238,8 @@
 					Peca(child).ghost = ghostObj;
 					Peca(child).addListeners();
 					Peca(child).inicialPosition = new Point(child.x, child.y);
-					child.addEventListener(Event.CHANGE, verifyPosition);
-					child.addEventListener(Event.ACTIVATE, verifyForFilter);
+					child.addEventListener("paraArraste", verifyPosition);
+					child.addEventListener("iniciaArraste", verifyForFilter);
 					Peca(child).buttonMode = true;
 					Peca(child).gotoAndStop(1);
 				}
