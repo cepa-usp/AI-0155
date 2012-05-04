@@ -59,12 +59,12 @@
 			}
 			verificaFinaliza();
 			
-			/*
+			
 			if (completed) {
 				travaPecas();
 			}else iniciaTutorial();
-			*/
-			iniciaTutorial();
+			
+			//iniciaTutorial();
 		}
 		
 		/**
@@ -169,7 +169,7 @@
 				saveStatus();
 				commit();
 				
-				//travaPecas();
+				travaPecas();
 			}
 			
 			setChildIndex(feedbackScreen, numChildren - 1);
@@ -186,8 +186,8 @@
 				}
 			}
 			
-			finaliza.mouseEnabled = false;
-			finaliza.alpha = 0.5;
+			//finaliza.mouseEnabled = false;
+			//finaliza.alpha = 0.5;
 			
 			botoes.resetButton.mouseEnabled = false;
 			botoes.resetButton.alpha = 0.5;
