@@ -51,20 +51,20 @@
 			
 			createAnswer();
 			
-			if (ExternalInterface.available) {
+			/*if (ExternalInterface.available) {
 				initLMSConnection();
 				if (mementoSerialized != null) {
 					if(mementoSerialized != "" && mementoSerialized != "null") recoverStatus(mementoSerialized);
 				}
-			}
+			}*/
 			verificaFinaliza();
 			
-			
+			/*
 			if (completed) {
 				travaPecas();
 			}else iniciaTutorial();
-			
-			//iniciaTutorial();
+			*/
+			iniciaTutorial();
 		}
 		
 		/**
