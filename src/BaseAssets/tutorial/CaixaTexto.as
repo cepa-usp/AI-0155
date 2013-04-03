@@ -1,5 +1,9 @@
-package 
+package BaseAssets.tutorial
 {
+	import BaseAssets.events.BaseEvent;
+	import com.eclecticdesignstudio.motion.Actuate;
+	import com.eclecticdesignstudio.motion.easing.Elastic;
+	import com.eclecticdesignstudio.motion.easing.Linear;
 	import flash.display.SimpleButton;
 	import flash.display.Sprite;
 	import flash.display.Stage;
@@ -7,9 +11,11 @@ package
 	import flash.events.MouseEvent;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	/**
 	 * ...
 	 * @author Alexandre
@@ -39,12 +45,15 @@ package
 		private var distanceToObject:Number = 10;
 		private var actualPosition:Point = new Point();
 		
-		private var hasNext:Boolean = false;
-		private var nextButton:NextButton;
-		private var nextButtonBorder:Number = 2;
+		private var hasNext:Boolean = true;
+		private var nextButton:TutoNext;
+		private var closeButton:TutoClose;
 		private var textArray:Array;
 		private var currentWidth:Number = 200;
 		private var minWidth:Number;
+		
+		private var normalGlow:GlowFilter = new GlowFilter(0x000000, 0.5, 6, 6, 2, 2);
+		private var errorGlow:GlowFilter = new GlowFilter(0xFF0000, 1, 6, 6, 2, 2);
 		
 		public function CaixaTexto(roundCorner:Boolean = false)
 		{
@@ -52,10 +61,10 @@ package
 			this.roundCorner = roundCorner;
 			background = new Sprite();
 			addChild(background);
-			background.filters = [new GlowFilter(0x000000, 0.5, 6, 6, 2, 2)];
+			background.filters = [normalGlow];
 			
 			texto = new TextField();
-			texto.defaultTextFormat = new TextFormat("verdana", 11, 0x000000);
+			texto.defaultTextFormat = new TextFormat("arial", 12, 0x000000, null, null, null, null, null, TextFormatAlign.JUSTIFY);
 			texto.multiline = true;
 			texto.wordWrap = true;
 			texto.autoSize = TextFieldAutoSize.LEFT;
@@ -66,13 +75,19 @@ package
 			//texto.border = true;
 			addChild(texto);
 			
-			nextButton = new NextButton();
+			nextButton = new TutoNext();
+			closeButton = new TutoClose();
+			nextButton.buttonMode = true;
+			closeButton.buttonMode = true;
 			addChild(nextButton);
-			if (roundCorner) minWidth = nextButton.width + nextButtonBorder;
-			else minWidth = nextButton.width - 2 * marginText + 2 * nextButtonBorder;
+			addChild(closeButton);
+			if (roundCorner) minWidth = nextButton.width;
+			else minWidth = nextButton.width - 2 * marginText + 2;
 			
-			/*if (stage) stage.addEventListener(MouseEvent.CLICK, clickHandler);
-			else*/ addEventListener(Event.ADDED_TO_STAGE, addListener);
+			if (stage) stage.addEventListener(MouseEvent.MOUSE_DOWN, clickHandler);
+			else addEventListener(Event.ADDED_TO_STAGE, addListener);
+			
+			this.filters = [new GlowFilter(0xFF0000, 0, 1, 1)];
 		}
 		
 		private function addListener(e:Event):void 
@@ -83,63 +98,65 @@ package
 		
 		private function clickHandler(e:MouseEvent):void 
 		{
-			//trace("clicou em: " + e.target);
-			if (e.target is NextButton) {
-				if (textArray.length >= 1) {
-					setText(textArray, sideForArrow, alignForArrow, currentWidth);
-				}
-			}else if (e.target != background && !(e.target is SimpleButton)) {
-				if (this.visible) {
-					this.visible = false;
-					//trace("evento disparado");
-					dispatchEvent(new Event(Event.CLOSE));
-					
-				}
-				else this.visible = false;
+			//trace("clicou em: " + e.target.name);
+			if (e.target == nextButton) {
+				this.visible = false;
+				dispatchEvent(new BaseEvent(BaseEvent.NEXT_BALAO));
+			}else if (e.target == closeButton) {
+				this.visible = false;
+				dispatchEvent(new BaseEvent(BaseEvent.CLOSE_BALAO));
+			}else if (e.target.name == "block") {
+				Actuate.stop(background);
+				background.filters = [errorGlow];
+				//Actuate.tween(this, 0.2, { scaleX: 1.2, scaleY:1.2 } ).onComplete(backToNormal).ease(Elastic.easeIn);
+				Actuate.effects(background, 0.1).filter(0, { color:0xFFFFFF}).ease(Linear.easeNone).onComplete(backToNormal);
 			}
 		}
 		
-		public function setText(text:*, side:String = null, align:String = null, width:Number = 200):void
+		private function backToNormal():void 
 		{
-			this.textArray = null;
+			//Actuate.tween(this, 0.2, { scaleX:1, scaleY:1 } ).ease(Elastic.easeOut);
+			Actuate.effects(background, 0.1).filter(0, { color:0xFF0000} ).ease(Linear.easeNone).onComplete(backToNormal2);
+		}
+		
+		private function backToNormal2():void 
+		{
+			//Actuate.tween(this, 0.2, { scaleX:1, scaleY:1 } ).ease(Elastic.easeOut);
+			Actuate.effects(background, 0.1).filter(0, { color:0xFFFFFF} ).ease(Linear.easeNone).onComplete(backToNormal3);
+		}
+		
+		private function backToNormal3():void 
+		{
+			//Actuate.tween(this, 0.2, { scaleX:1, scaleY:1 } ).ease(Elastic.easeOut);
+			Actuate.effects(background, 0.1).filter(0, { color:0xFF0000} ).ease(Linear.easeNone).onComplete(back2);
+		}
+		
+		private function back2():void 
+		{
+			Actuate.stop(background);
+			Actuate.timer(0.001).onComplete(back3);
+			//background.filters = [normalGlow];
+		}
+		
+		private function back3():void 
+		{
+			background.filters = [normalGlow];
+		}
+		
+		public function setText(text:String, side:String = null, align:String = null, width:Number = 200):void
+		{
 			texto.text = "";
 			
 			if (width >= minWidth) texto.width = width;
 			else texto.width = minWidth;
 			
-			if (text is String) {
-				texto.text = text;
-				hasNext = false;
-			}else if (text is Array) {
-				var arrayCopy:Array = [];
-				for (var i:int = 0; i < text.length; i++) 
-				{
-					arrayCopy[i] = text[i];
-					
-				}
-				if (arrayCopy.length > 1) {
-					texto.text = arrayCopy[0];
-					this.textArray = arrayCopy;
-					this.textArray.splice(0, 1);
-					hasNext = true;
-				}else if (arrayCopy.length == 1) {
-					texto.text = arrayCopy[0];
-					this.textArray = arrayCopy;
-					this.textArray.splice(0, 1);
-					hasNext = false;
-				}else {
-					this.visible = false;
-					return;
-				}
-			}else {
-				this.visible = false;
-				return;
-			}
+			texto.text = text;
 			
 			currentWidth = width;
 			if(side != null) sideForArrow = side;
-			if(align != null) alignForArrow = align;
-			drawBackground(texto.textWidth, texto.textHeight);
+			if (align != null) alignForArrow = align;
+			
+			drawBackground(texto.width, texto.textHeight);
 			posicionaNextButton();
 			setPosition(actualPosition.x, actualPosition.y);
 			this.visible = true;
@@ -154,11 +171,13 @@ package
 			nextButton.visible = true;
 			var textWidth:Number;
 			if (texto.textWidth < minWidth) textWidth = minWidth;
-			else textWidth = texto.textWidth;
+			else textWidth = texto.width;
 			
-			if (roundCorner) nextButton.x = marginText + textWidth - nextButton.width / 2;
-			else nextButton.x = 2 * marginText + textWidth - nextButton.width / 2 - nextButtonBorder;
-			nextButton.y = 2 * marginText + texto.textHeight + nextButton.height / 2 + nextButtonBorder;
+			closeButton.x = marginText + textWidth - nextButton.width / 2 + 4;
+			closeButton.y = 2 * marginText + texto.textHeight + nextButton.height / 2;
+			
+			nextButton.x = closeButton.x - closeButton.width / 2 - nextButton.width / 2 - 5;
+			nextButton.y = closeButton.y;
 		}
 		
 		public function setPosition(x:Number, y:Number):void
@@ -188,7 +207,7 @@ package
 					}
 					break;
 				case RIGHT:
-					this.x = x - distanceToObject - (2 * marginText) - heightArrow - texto.textWidth;
+					this.x = x - distanceToObject - (2 * marginText) - heightArrow - texto.width;
 					if (alignForArrow == FIRST) {
 						this.y = y - marginText - widthArrow / 2;
 					}else if (alignForArrow == CENTER) {
@@ -204,9 +223,12 @@ package
 					}else if (alignForArrow == CENTER) {
 						this.x = x - marginText - texto.textWidth / 2;
 					}else {
-						this.x = x - marginText - texto.textWidth + widthArrow / 2;
+						this.x = x - marginText - texto.width + widthArrow / 2;
 					}
 					break;
+				default:
+					this.x = x;
+					this.y = y;
 			}
 		}
 		
@@ -218,8 +240,7 @@ package
 			background.graphics.moveTo(marginText, 0);
 			
 			if (hasNext) {
-				if(roundCorner) h = h + nextButton.height + nextButtonBorder + marginText;
-				else h = h + nextButton.height + 2 * nextButtonBorder;
+				h = h + nextButton.height + marginText;
 			}
 			
 			if (w < minWidth) {

@@ -1,7 +1,9 @@
 ﻿package 
 {
 	import BaseAssets.BaseMain;
-	import com.adobe.serialization.json.JSON;
+	import BaseAssets.tutorial.CaixaTextoNova;
+	import BaseAssets.tutorial.Tutorial;
+	import BaseAssets.tutorial.TutorialEvent;
 	import cepa.utils.ToolTip;
 	import fl.transitions.easing.None;
 	import fl.transitions.Tween;
@@ -46,8 +48,10 @@
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			this.scrollRect = new Rectangle(0, 0, 700, 600);
 			
+			conectaImagens();
 			adicionaListeners();
 			addListeners();
+			criaTutorial();
 			
 			createAnswer();
 			
@@ -64,7 +68,25 @@
 				travaPecas();
 			}else iniciaTutorial();
 			*/
-			iniciaTutorial();
+			
+			if (ExternalInterface.available) {
+				var ls:String = ExternalInterface.call("getLocalStorageString");
+				if (ls == "true") tutorialCompleted = true;
+			}
+			
+			if(!tutorialCompleted) iniciaTutorial();
+		}
+		
+		private function conectaImagens():void 
+		{
+			Fundo(fundo1).imagem = imagem1;
+			Fundo(fundo2).imagem = imagem2;
+			Fundo(fundo3).imagem = imagem3;
+			Fundo(fundo4).imagem = imagem4;
+			Fundo(fundo5).imagem = imagem5;
+			Fundo(fundo6).imagem = imagem6;
+			Fundo(fundo7).imagem = imagem7;
+			Fundo(fundo8).imagem = imagem8;
 		}
 		
 		/**
@@ -137,6 +159,8 @@
 			finaliza.buttonMode = true;
 		}
 		
+		private var wrongFilter:GlowFilter = new GlowFilter(0xFF0000);
+		private var rightFilter:GlowFilter = new GlowFilter(0x00DD00);
 		private function finalizaExec(e:MouseEvent):void 
 		{
 			var nCertas:int = 0;
@@ -149,7 +173,10 @@
 					nPecas++;
 					if(Peca(child).fundo.indexOf(Peca(child).currentFundo) != -1){
 						nCertas++;
-						trace(Peca(child).nome);
+						//trace(Peca(child).nome);
+						Peca(child).currentFundo.filters = [rightFilter];
+					}else {
+						Peca(child).currentFundo.filters = [wrongFilter];
 					}
 				}
 			}
@@ -157,7 +184,7 @@
 			var currentScore:Number = int((nCertas / nPecas) * 100);
 			
 			if (currentScore < 100) {
-				feedbackScreen.setText("Ops!... \nReveja sua resposta.\nInicie uma nova tentativa para refazer o exercício.");
+				feedbackScreen.setText("Ops! Reveja sua resposta (os erros foram destacados em vermelho) e, se quiser, pressione o botão \"reset\" para começar de novo (no canto inferior direito da tela).");
 			}
 			else {
 				feedbackScreen.setText("Parabéns!\nA classificação está correta!");
@@ -262,12 +289,12 @@
 				}
 			}
 			
-			mementoSerialized = JSON.encode(status);
+			mementoSerialized = JSON.stringify(status);
 		}
 		
 		private function recoverStatus(memento:String):void
 		{
-			var status:Object = JSON.decode(memento);
+			var status:Object = JSON.parse(memento);
 			
 			for (var i:int = 0; i < numChildren; i++)
 			{
@@ -287,7 +314,7 @@
 		
 		private var pecaDragging:Peca;
 		//private var fundoFilter:GlowFilter = new GlowFilter(0xFF0000, 1, 20, 20, 1, 2, true, true);
-		private var fundoFilter:GlowFilter = new GlowFilter(0x800000);
+		private var fundoFilter:GlowFilter = new GlowFilter(0x0000FF);
 		private var fundoWGlow:MovieClip;
 		private function verifyForFilter(e:Event):void 
 		{
@@ -420,7 +447,7 @@
 			{
 				var child:DisplayObject = getChildAt(i);
 				if (child is Fundo) {
-					if (child.hitTestPoint(position.x, position.y)) return Fundo(child);
+					if (child.hitTestPoint(position.x, position.y) || Fundo(child).imagem.hitTestPoint(position.x, position.y)) return Fundo(child);
 				}
 			}
 			return null;
@@ -491,51 +518,30 @@
 		
 		//---------------- Tutorial -----------------------
 		
-		private var balao:CaixaTexto;
-		private var pointsTuto:Array;
-		private var tutoBaloonPos:Array;
-		private var tutoPos:int;
-		private var tutoSequence:Array = ["Arraste os filos...", 
-										  "... para as caixas corretas...",
-										  "... conforme descrito nas orientações.",
-										  "Quando você tiver concluído, pressione \"terminei\"."];
+		private var tutorial:Tutorial;
+		private var tutorialCompleted:Boolean = false;
+		
+		private function criaTutorial():void
+		{
+			tutorial = new Tutorial();
+			tutorial.adicionarBalao("Arraste os filos...", new Point(365, 510), CaixaTextoNova.BOTTOM, CaixaTextoNova.CENTER);
+			tutorial.adicionarBalao("... para as caixas corretas...", new Point(350 , 177), CaixaTextoNova.TOP, CaixaTextoNova.CENTER);
+			tutorial.adicionarBalao("... conforme descrito nas orientações.", new Point(650 , 500), CaixaTextoNova.RIGHT, CaixaTextoNova.FIRST);
+			tutorial.adicionarBalao("Quando você tiver concluído, pressione \"terminei\".", new Point(finaliza.x, finaliza.y + finaliza.height / 2), CaixaTextoNova.TOP, CaixaTextoNova.LAST);
+		}
 		
 		public function iniciaTutorial(e:MouseEvent = null):void 
 		{
-			tutoPos = 0;
-			if(balao == null){
-				balao = new CaixaTexto(true);
-				addChild(balao);
-				balao.visible = false;
-				
-				pointsTuto = 	[new Point(365, 510),
-								new Point(350 , 177),
-								new Point(650 , 500),
-								new Point(finaliza.x, finaliza.y + finaliza.height / 2)];
-								
-				tutoBaloonPos = [[CaixaTexto.BOTTON, CaixaTexto.CENTER],
-								[CaixaTexto.TOP, CaixaTexto.CENTER],
-								[CaixaTexto.RIGHT, CaixaTexto.FIRST],
-								[CaixaTexto.TOP, CaixaTexto.FIRST]];
-			}
-			balao.removeEventListener(Event.CLOSE, closeBalao);
-			
-			balao.setText(tutoSequence[tutoPos], tutoBaloonPos[tutoPos][0], tutoBaloonPos[tutoPos][1]);
-			balao.setPosition(pointsTuto[tutoPos].x, pointsTuto[tutoPos].y);
-			balao.addEventListener(Event.CLOSE, closeBalao);
-			balao.visible = true;
+			tutorial.removeEventListener(TutorialEvent.FIM_TUTORIAL, tutorialFinalizado);
+			tutorial.iniciar(stage, true);
+			tutorial.addEventListener(TutorialEvent.FIM_TUTORIAL, tutorialFinalizado);
 		}
 		
-		private function closeBalao(e:Event):void 
+		private function tutorialFinalizado(e:TutorialEvent):void 
 		{
-			tutoPos++;
-			if (tutoPos >= tutoSequence.length) {
-				balao.removeEventListener(Event.CLOSE, closeBalao);
-				balao.visible = false;
-			}else {
-				balao.setText(tutoSequence[tutoPos], tutoBaloonPos[tutoPos][0], tutoBaloonPos[tutoPos][1]);
-				balao.setPosition(pointsTuto[tutoPos].x, pointsTuto[tutoPos].y);
-			}
+			tutorial.removeEventListener(TutorialEvent.FIM_TUTORIAL, tutorialFinalizado);
+			if (e.last) tutorialCompleted = true;
+			if (ExternalInterface.available) ExternalInterface.call("save2LS", tutorialCompleted.toString());
 		}
 		
 		

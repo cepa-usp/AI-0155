@@ -51,6 +51,7 @@
   <!-- SWC Libraries -->
   <libraryPaths>
     <element path="src\as3corelib.swc" />
+    <element path="src\BaseAssets\tutorial\tutorialButtons.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
