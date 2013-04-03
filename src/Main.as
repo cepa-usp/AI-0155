@@ -11,12 +11,14 @@
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.ui.Keyboard;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.setTimeout;
@@ -55,24 +57,16 @@
 			
 			createAnswer();
 			
-			/*if (ExternalInterface.available) {
+			if (ExternalInterface.available) {
 				initLMSConnection();
 				if (mementoSerialized != null) {
 					if(mementoSerialized != "" && mementoSerialized != "null") recoverStatus(mementoSerialized);
 				}
-			}*/
+			}
+			
 			verificaFinaliza();
 			
-			/*
-			if (completed) {
-				travaPecas();
-			}else iniciaTutorial();
-			*/
-			
-			if (ExternalInterface.available) {
-				var ls:String = ExternalInterface.call("getLocalStorageString");
-				if (ls == "true") tutorialCompleted = true;
-			}
+			if (completed) travaPecas();
 			
 			if(!tutorialCompleted) iniciaTutorial();
 		}
@@ -157,6 +151,20 @@
 		{
 			finaliza.addEventListener(MouseEvent.CLICK, finalizaExec);
 			finaliza.buttonMode = true;
+			
+			//stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
+		}
+		
+		private function keyHandler(e:KeyboardEvent):void 
+		{
+			if (e.keyCode == Keyboard.S) {
+				trace("salvando");
+				saveStatusForRecovery();
+			}
+			if (e.keyCode == Keyboard.R) {
+				trace("recuperando");
+				recoverStatus(mementoSerialized);
+			}
 		}
 		
 		private var wrongFilter:GlowFilter = new GlowFilter(0xFF0000);
@@ -190,17 +198,16 @@
 				feedbackScreen.setText("Parabéns!\nA classificação está correta!");
 			}
 			
+			setChildIndex(feedbackScreen, numChildren - 1);
+			setChildIndex(bordaAtividade, numChildren - 1);
+			
 			if (!completed) {
+				travaPecas();
 				completed = true;
 				score = currentScore;
 				saveStatus();
-				commit();
-				
-				travaPecas();
+				//commit();
 			}
-			
-			setChildIndex(feedbackScreen, numChildren - 1);
-			setChildIndex(bordaAtividade, numChildren - 1);
 		}
 		
 		private function travaPecas():void 
@@ -279,6 +286,7 @@
 			var status:Object = new Object();
 			
 			status.pecas = new Object();
+			status.tutoComp = tutorialCompleted;
 			
 			for (var i:int = 0; i < numChildren; i++)
 			{
@@ -295,6 +303,8 @@
 		private function recoverStatus(memento:String):void
 		{
 			var status:Object = JSON.parse(memento);
+			
+			tutorialCompleted = status.tutoComp;
 			
 			for (var i:int = 0; i < numChildren; i++)
 			{
@@ -508,6 +518,7 @@
 				}
 				if (child is Fundo) {
 					Fundo(child).currentPeca = null;
+					Fundo(child).filters = [];
 				}
 			}
 			
@@ -541,7 +552,8 @@
 		{
 			tutorial.removeEventListener(TutorialEvent.FIM_TUTORIAL, tutorialFinalizado);
 			if (e.last) tutorialCompleted = true;
-			if (ExternalInterface.available) ExternalInterface.call("save2LS", tutorialCompleted.toString());
+			//if (ExternalInterface.available) ExternalInterface.call("save2LS", tutorialCompleted.toString());
+			saveStatus();
 		}
 		
 		
@@ -621,7 +633,7 @@
 			else
 			{
 				trace("Esta Atividade Interativa não está conectada a um LMS: seu aproveitamento nela NÃO será salvo.");
-				mementoSerialized = ExternalInterface.call("getLocalStorageString");
+				if(ExternalInterface.available) mementoSerialized = ExternalInterface.call("getLocalStorageString");
 			}
 			
 			//reset();
