@@ -25,7 +25,7 @@ function init () {
 	attributes.id = "ai";
 	attributes.align = "middle";
 
-	swfobject.embedSWF("swf/AI_Loader.swf", "ai-container", flashvars.width, flashvars.height, "10.0.0", "expressInstall.swf", flashvars, params, attributes);
+	swfobject.embedSWF("swf/AI_Loader.swf", "ai-container", flashvars.width, flashvars.height, "10.3", "expressInstall.swf", flashvars, params, attributes);
 	
 }
 

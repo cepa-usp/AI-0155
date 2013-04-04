@@ -35,8 +35,8 @@ package pipwerks {
 	
 	public class SCORM {
 		
-		private var __connectionActive = false,
-					__debugActive = true;
+		private var __connectionActive:Boolean = false,
+					__debugActive:Boolean = true;
 	
 	
 		public function SCORM() {
