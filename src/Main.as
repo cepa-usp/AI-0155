@@ -197,6 +197,7 @@
 				travaPecas();
 				//debugMessage("travou peças");
 				saveAPI.completed = true;
+				tutorialCompleted = true;
 				//debugMessage("completo");
 				saveAPI.score = currentScore;
 				saveStatus();

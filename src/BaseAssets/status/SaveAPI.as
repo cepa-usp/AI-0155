@@ -104,6 +104,12 @@ package BaseAssets.status
 			{
 				trace("Esta Atividade Interativa não está conectada a um LMS: seu aproveitamento nela NÃO será salvo.");
 				mementoSerialized = ExternalInterface.call("getLocalStorageString");
+				if(mementoSerialized != null){
+					var descompressed:String = uncompress(mementoSerialized);
+					var status = JSON.decode(descompressed);
+					completed = status.completed;
+					score = status.score;
+				}
 			}
 			
 			//reset();
@@ -171,7 +177,13 @@ package BaseAssets.status
 		public function saveStatus(memento:Object):void
 		{
 			//var stringMemento:String = JSON.stringify(memento);
-			var stringMemento:String = JSON.encode(memento);
+			var status:Object = new Object();
+			status.memento = memento;
+			status.completed = completed;
+			status.score = score;
+			
+			//var stringMemento:String = JSON.encode(memento);
+			var stringMemento:String = JSON.encode(status);
 			mementoSerialized = compress(stringMemento);
 			//trace("compactado: " + mementoSerialized);
 			
@@ -195,7 +207,10 @@ package BaseAssets.status
 					mementoSerialized = descompressed;
 					//trace("descompactado: " + mementoSerialized);
 					//obj = JSON.parse(mementoSerialized);
-					obj = JSON.decode(mementoSerialized);
+					var status = JSON.decode(mementoSerialized);
+					obj = status.memento;
+					//obj = JSON.decode(mementoSerialized);
+					
 				}catch (error:Error){
 					
 				}
