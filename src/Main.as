@@ -70,7 +70,10 @@
 			
 			verificaFinaliza();
 			
-			if (saveAPI.completed) travaPecas();
+			if (saveAPI.completed) {
+				travaPecas();
+				getScore();
+			}
 			
 			if(!tutorialCompleted) iniciaTutorial();
 		}
@@ -162,25 +165,7 @@
 		private var rightFilter:GlowFilter = new GlowFilter(0x00DD00);
 		private function finalizaExec(e:MouseEvent):void 
 		{
-			var nCertas:int = 0;
-			var nPecas:int = 0;
-			
-			for (var i:int = 0; i < numChildren; i++) 
-			{
-				var child:DisplayObject = getChildAt(i);
-				if (child is Peca) {
-					nPecas++;
-					if(Peca(child).fundo.indexOf(Peca(child).currentFundo) != -1){
-						nCertas++;
-						//trace(Peca(child).nome);
-						Peca(child).currentFundo.filters = [rightFilter];
-					}else {
-						Peca(child).currentFundo.filters = [wrongFilter];
-					}
-				}
-			}
-			
-			var currentScore:Number = int((nCertas / nPecas) * 100);
+			var currentScore:int = getScore();
 			
 			if (currentScore < 100) {
 				feedbackScreen.setText("Ops! Reveja sua resposta. Os erros foram destacados em vermelho.");
@@ -202,6 +187,29 @@
 				saveAPI.score = currentScore;
 				saveStatus();
 			}
+		}
+		
+		private function getScore():int
+		{
+			var nCertas:int = 0;
+			var nPecas:int = 0;
+			
+			for (var i:int = 0; i < numChildren; i++) 
+			{
+				var child:DisplayObject = getChildAt(i);
+				if (child is Peca) {
+					nPecas++;
+					if(Peca(child).fundo.indexOf(Peca(child).currentFundo) != -1){
+						nCertas++;
+						//trace(Peca(child).nome);
+						Peca(child).currentFundo.filters = [rightFilter];
+					}else {
+						Peca(child).currentFundo.filters = [wrongFilter];
+					}
+				}
+			}
+			
+			return int((nCertas / nPecas) * 100);
 		}
 		
 		private function debugMessage(txt:String):void
