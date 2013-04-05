@@ -183,7 +183,7 @@
 			var currentScore:Number = int((nCertas / nPecas) * 100);
 			
 			if (currentScore < 100) {
-				feedbackScreen.setText("Ops! Reveja sua resposta (os erros foram destacados em vermelho) e, se quiser, pressione o botão \"reset\" para começar de novo (no canto inferior direito da tela).");
+				feedbackScreen.setText("Ops! Reveja sua resposta. Os erros foram destacados em vermelho.");
 			}
 			else {
 				feedbackScreen.setText("Parabéns!\nA classificação está correta!");
