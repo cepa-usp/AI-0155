@@ -141,6 +141,12 @@ package BaseAssets.status
 				
 				if (score > 80) success = scorm.set("cmi.success_status", "passed");
 				else success = scorm.set("cmi.success_status", "failed");
+
+				if(completed){
+			  		scorm.set("cmi.exit", "normal");
+				} else {
+			  		scorm.set("cmi.exit", "suspend");
+				}
 				
 				if (success)
 				{
